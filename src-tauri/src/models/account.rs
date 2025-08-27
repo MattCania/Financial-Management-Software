@@ -10,7 +10,6 @@ pub struct Model {
     pub password: String,
 }
 
-
 #[derive(Debug, Clone, EnumIter, DeriveRelation)]
 pub enum Relation {}
 

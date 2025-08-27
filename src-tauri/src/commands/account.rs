@@ -1,17 +1,19 @@
-use sea_orm::{ActiveModelTrait, Set};
+use sea_orm::{ActiveModelTrait, Set, EntityTrait};
+use tauri::State;
 
+use crate::models::account;
 use crate::types::account::Account;
-use crate::{models, DbState};
 use crate::types::response::RequestResponse;
+use crate::{models, DbState};
 
 #[tauri::command]
 pub async fn create_account(
-    state: tauri::State<'_, DbState>,
+    state: State<'_, DbState>,
     data: Account
-) -> Result<RequestResponse<models::account::Model>, String> {
+) -> Result<RequestResponse<account::Model>, String> {
     let db = &state.connection;
 
-    let user = models::account::ActiveModel {
+    let user = account::ActiveModel {
         email: Set(data.email.to_owned()),
         password: Set(data.password.to_owned()),
         ..Default::default()
@@ -28,5 +30,21 @@ pub async fn create_account(
             message: format!("Account Creation Failed: {}", e),
             data: None,
         }),
+    }
+}
+
+#[tauri::command]
+pub async fn get_accounts(
+    state: State<'_, DbState>
+) -> Result<RequestResponse<Vec<account::Model>>, String> {
+    let db = &state.connection;
+
+    match account::Entity::find().all(db).await {
+        Ok(accs) => Ok(RequestResponse {
+            ok: true,
+            message: "Accounts retrieved successfully".to_string(),
+            data: Some(accs),
+        }),
+        Err(e) => Err(format!("Database error: {}", e)),
     }
 }

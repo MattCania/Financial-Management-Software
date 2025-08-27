@@ -1,50 +1,73 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  async function handleSubmission(e) {
+    e.preventDefault();
+
+    try {
+      const response = await invoke("create_account", {
+        data: formData
+      });
+
+      console.log("Server response:", response);
+      alert("Account created successfully!");
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Failed to create account.");
+    }
+  }
+
+  function handleInputChange(e) {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+
+  async function requestAccounts() {
+    let res = await invoke("get_accounts");
+
+    if (res) {
+      console.log(res)
+    }
+    else {
+      console.log("Failure to Request")
+    }
   }
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
+  <>
+    <button onClick={requestAccounts}>Request Accounts</button>
+    <form className="form" onSubmit={handleSubmission}>
+      <label htmlFor="email">Email:</label>
+      <input
+        type="text"
+        name="email"
+        placeholder="email@gmail.com"
+        value={formData.email}
+        onChange={handleInputChange}
+      />
 
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
+      <label htmlFor="password">Password:</label>
+      <input
+        type="password"
+        name="password"
+        placeholder="skibidi1234"
+        value={formData.password}
+        onChange={handleInputChange}
+      />
 
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+      <input type="submit" value="Create Account" />
+    </form>
+  </>
   );
 }
 
