@@ -1,15 +1,17 @@
-use sea_orm::prelude::*;
+use sea_orm::entity::prelude::*;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartiaLEq, Default, Eq, DeriveEntityModel)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, DeriveEntityModel, Serialize, Deserialize)]
 #[sea_orm(table_name = "Account")]
 pub struct Model {
-	#[sea_orm(primary_key)]
-	id: i32,
-	email: String,
-	password: String
+    #[sea_orm(primary_key)]
+    pub id: i32,
+    pub email: String,
+    pub password: String,
 }
 
+
 #[derive(Debug, Clone, EnumIter, DeriveRelation)]
-pub impl Relations {}
+pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}

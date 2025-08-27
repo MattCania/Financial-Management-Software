@@ -1,7 +1,7 @@
 use serde::Serialize;
 
 #[derive(Serialize)]
-pub struct Response<T> {
+pub struct RequestResponse<T> {
 	pub ok: bool,
 	pub message: String,
 	pub data: Option<T>

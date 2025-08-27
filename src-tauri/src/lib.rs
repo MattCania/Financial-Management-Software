@@ -1,7 +1,12 @@
+pub mod commands;
+pub mod models;
+pub mod services;
+pub mod types;
+
 use sea_orm::DatabaseConnection;
 
-mod services;
 use services::database::init_db;
+use commands::account::create_account;
 
 pub struct DbState {
     pub connection: DatabaseConnection
@@ -19,7 +24,7 @@ pub async fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(DbState{ connection: db })
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![greet, create_account])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
